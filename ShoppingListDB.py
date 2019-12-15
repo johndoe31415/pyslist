@@ -31,8 +31,9 @@ class ShoppingListDB():
 		with contextlib.suppress(sqlite3.OperationalError):
 			self._cursor.execute("""
 			CREATE TABLE items (
-				itemid integer PRIMARY KEY,
-				description varchar NOT NULL
+				itemid integer PRIMARY KEY AUTOINCREMENT,
+				description varchar NOT NULL UNIQUE,
+				hidden boolean DEFAULT 0
 			);
 			""")
 
@@ -50,7 +51,7 @@ class ShoppingListDB():
 		with contextlib.suppress(sqlite3.OperationalError):
 			self._cursor.execute("""
 			CREATE TABLE stores (
-				storeid integer PRIMARY KEY,
+				storeid integer PRIMARY KEY AUTOINCREMENT,
 				storename varchar NOT NULL UNIQUE
 			);
 			""")
@@ -81,8 +82,36 @@ class ShoppingListDB():
 			""")
 
 	def get_shopping_list(self):
-		self._cursor.execute("SELECT FROM shopping_list ")
-		pass
+		return { itemid: itemcount for (itemid, itemcount) in self._cursor.execute("SELECT itemid, itemcount FROM shopping_list WHERE itemcount > 0;").fetchall() }
+
+	def add_store(self, store_name):
+		with contextlib.suppress(sqlite3.IntegrityError):
+			self._cursor.execute("INSERT INTO stores (storename) VALUES (?);", (store_name, ))
+			self._db.commit()
+		return self._cursor.execute("SELECT storeid FROM stores WHERE storename = ?;", (store_name, )).fetchone()[0]
+
+	def reset_store_order(self, storeid):
+		self._cursor.execute("DELETE FROM storeitemorder WHERE storeid = ?", (storeid, ))
+		self._db.commit()
+
+	def set_store_order(self, storeid, item_orders):
+		for (itemid, orderno) in sorted(item_orders.items()):
+			self._cursor.execute("INSERT INTO storeitemorder (storeid, itemid, orderno) VALUES (?, ?, ?);", (storeid, itemid, orderno))
+		self._db.commit()
+
+	def add_item(self, item_name, commit = True):
+		with contextlib.suppress(sqlite3.IntegrityError):
+			self._cursor.execute("INSERT INTO items (description) VALUES (?);", (item_name, ))
+			if commit:
+				self._db.commit()
+		return self._cursor.execute("SELECT itemid FROM items WHERE description = ?;", (item_name, )).fetchone()[0]
+
+	def add_items(self, item_names):
+		item_ids = { }
+		for item_name in item_names:
+			item_ids[item_name] = self.add_item(item_name, commit = False)
+		self._db.commit()
+		return item_ids
 
 	def process_transaction(self, transactionid, itemid, delta, user):
 		if delta == 0:
@@ -116,4 +145,6 @@ class ShoppingListDB():
 if __name__ == "__main__":
 	import uuid
 	db = ShoppingListDB("example.sqlite3")
-	db.process_transaction(str(uuid.uuid4()), 1, 1, "joe")
+	foo_item = db.add_item("Foo Item")
+	db.process_transaction(str(uuid.uuid4()), itemid = foo_item, delta = 1, user = "joe")
+	print(db.get_shopping_list())
