@@ -1,0 +1,111 @@
+Erdnussbutter
+Marmelade
+Schwarzer Tee
+
+Windeln
+Säuglingsmilch
+
+Zitronenlimonade
+Radler
+Bier
+
+Limetten
+Zitronen
+
+Tomaten
+Karotten
+Salat
+Gurke
+Champignons
+Knoblauch
+Avokado
+Blumenkohl
+Zucchini
+Auberginen
+Lauch
+Brokkoli
+Blumenkohl
+Frühlingszwiebeln
+Süßkartoffeln
+
+Äpfel
+Birne
+Orange
+Grapefruit
+Mandarinen
+Bananen
+Pflaumen
+Erdbeeren
+Himbeeren
+
+Zwiebeln
+Kartoffeln
+
+Salz
+Stärke
+Weichweizengrieß
+Hartweizengrieß
+Senf
+Ketchup
+
+Milchreis
+Rundkornreis
+Sushireis
+Langkornreis
+
+Steak
+Rinderhack
+Hünchchenbrust
+
+Zucker
+Puderzucker
+Mehl
+Dinkelmehl
+
+Salami
+Wienerle
+Fleischwurst
+Mozarella
+Cheddar
+Parmesan
+
+Milch
+Sahne
+Saure Sahne
+Butter
+Hefe
+Joghurt
+Quark
+Creme Fraiche
+
+Olivenöl
+Sonnenblumenöl
+Rapsöl
+
+Vanillezucker
+Backpulver
+Gemahlene Haselnüsse
+Gemahlene Mandeln
+Kakaopulver
+
+Tiefkühl Fertiggerichte
+Tiefkühl Spinat
+Tiefkühl Gemüse
+Tiefkühl Brokkoli
+Tiefkühl Erdbeeren
+
+Schattenmorellen
+Essiggurken
+
+Brot
+Brötchen
+Baguette
+
+====
+
+Paprikapuler
+Sojasauce
+Leinöl
+Backnatron
+Knödelteig
+Brauner Zucker
