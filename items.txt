@@ -1,6 +1,15 @@
+Kaffeebohnen
+
 Erdnussbutter
 Marmelade
 Schwarzer Tee
+
+Müsli
+Haferflocken
+
+Smoothie
+Fertigsalat
+Sushi
 
 Windeln
 Säuglingsmilch
@@ -8,6 +17,10 @@ Säuglingsmilch
 Zitronenlimonade
 Radler
 Bier
+Mineralwasser
+
+Rotwein
+Weißwein
 
 Limetten
 Zitronen
@@ -36,6 +49,9 @@ Bananen
 Pflaumen
 Erdbeeren
 Himbeeren
+Heidelbeeren
+Ananas
+Mango
 
 Zwiebeln
 Kartoffeln
@@ -52,14 +68,38 @@ Rundkornreis
 Sushireis
 Langkornreis
 
+Lachs
 Steak
 Rinderhack
 Hünchchenbrust
+Grillfleisch
 
 Zucker
 Puderzucker
 Mehl
 Dinkelmehl
+
+Müllbeutel klein (10l)
+Müllbeutel groß (60l)
+Backpapier
+Alufolie
+Frischhaltefolie
+Klopapier
+Zewa
+
+Badreiniger
+Kalkreiniger
+Chlor
+Scheuerpulver
+
+Topfreiniger
+Spüllappen
+
+Orangensaft
+Apfelsaft
+
+Stremellachs
+Nürnbergerle
 
 Salami
 Wienerle
@@ -93,6 +133,10 @@ Tiefkühl Gemüse
 Tiefkühl Brokkoli
 Tiefkühl Erdbeeren
 
+Gehackte Tomaten (Konserve)
+Ganze Tomaten (Konserve)
+Kokosmilch (Konserve)
+Gerillte Paprika (Glas)
 Schattenmorellen
 Essiggurken
 
@@ -108,3 +152,4 @@ Leinöl
 Backnatron
 Knödelteig
 Brauner Zucker
+Teebeutel

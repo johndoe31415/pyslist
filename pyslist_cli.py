@@ -21,6 +21,7 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import sys
+import json
 from MultiCommand import MultiCommand
 from ShoppingListDB import ShoppingListDB
 
@@ -52,11 +53,19 @@ def action_import_store(cmd, args):
 	ordernos = { itemids[itemname]: item_ordernos[itemname] for itemname in item_ordernos }
 	db.set_store_order(storeid, ordernos)
 
+def action_dump(cmd, args):
+	db = ShoppingListDB(args.dbfile)
+	print(json.dumps(db.get_all(), indent = 4, sort_keys = True))
+
 def genparser(parser):
-	parser.add_argument("-d", "--dbfile", metavar = "filename", type = str, default = "pysqlist.sqlite3", help = "Specifies the database file that is used. Defaults to %(default)s.")
+	parser.add_argument("-d", "--dbfile", metavar = "filename", type = str, default = "pyslist.sqlite3", help = "Specifies the database file that is used. Defaults to %(default)s.")
 	parser.add_argument("--verbose", action = "store_true", help = "Increase verbosity.")
 	parser.add_argument("storename", metavar = "storename", type = str, help = "Name of the store the list is for.")
 	parser.add_argument("itemlist", metavar = "itemlist", type = str, help = "List of items in the order they are to be appear in the database.")
 mc.register("import", "Import an item list for a specific store", genparser, action = action_import_store)
+
+def genparser(parser):
+	parser.add_argument("-d", "--dbfile", metavar = "filename", type = str, default = "pyslist.sqlite3", help = "Specifies the database file that is used. Defaults to %(default)s.")
+mc.register("dump", "Dump the database structure", genparser, action = action_dump)
 
 mc.run(sys.argv[1:])

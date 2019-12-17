@@ -32,8 +32,7 @@ class ShoppingListDB():
 			self._cursor.execute("""
 			CREATE TABLE items (
 				itemid integer PRIMARY KEY AUTOINCREMENT,
-				description varchar NOT NULL UNIQUE,
-				hidden boolean DEFAULT 0
+				description varchar NOT NULL UNIQUE
 			);
 			""")
 
@@ -83,6 +82,19 @@ class ShoppingListDB():
 
 	def get_shopping_list(self):
 		return { itemid: itemcount for (itemid, itemcount) in self._cursor.execute("SELECT itemid, itemcount FROM shopping_list WHERE itemcount > 0;").fetchall() }
+
+	def get_item_list(self):
+		return { itemid: description for (itemid, description) in self._cursor.execute("SELECT itemid, description FROM items;").fetchall() }
+
+	def get_order_list(self):
+		pass
+
+	def get_all(self):
+		return {
+			"shopping_list":	self.get_shopping_list(),
+			"items":			self.get_item_list(),
+			"order":			self.get_order_list(),
+		}
 
 	def add_store(self, store_name):
 		with contextlib.suppress(sqlite3.IntegrityError):
@@ -144,7 +156,7 @@ class ShoppingListDB():
 
 if __name__ == "__main__":
 	import uuid
-	db = ShoppingListDB("example.sqlite3")
+	db = ShoppingListDB("pyslist.sqlite3")
 	foo_item = db.add_item("Foo Item")
 	db.process_transaction(str(uuid.uuid4()), itemid = foo_item, delta = 1, user = "joe")
-	print(db.get_shopping_list())
+	print(db.get_all())
