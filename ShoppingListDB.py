@@ -86,14 +86,27 @@ class ShoppingListDB():
 	def get_item_list(self):
 		return { itemid: description for (itemid, description) in self._cursor.execute("SELECT itemid, description FROM items;").fetchall() }
 
-	def get_order_list(self):
-		pass
+	def _get_store_list(self):
+		return { storeid: storename for (storeid, storename) in self._cursor.execute("SELECT storeid, storename FROM stores;").fetchall() }
+
+	def _get_store_order(self, storeid):
+		return { itemid: orderno for (itemid, orderno) in self._cursor.execute("SELECT storeid, itemid FROM storeitemorder WHERE storeid = ?;", (storeid, )).fetchall() }
+
+	def get_stores(self):
+		stores = { }
+		for (storeid, storename) in self._get_store_list().items():
+			store = {
+				"storeid": storeid,
+				"order": self._get_store_order(storeid),
+			}
+			stores[storename] = store
+		return stores
 
 	def get_all(self):
 		return {
 			"shopping_list":	self.get_shopping_list(),
 			"items":			self.get_item_list(),
-			"order":			self.get_order_list(),
+			"stores":			self.get_stores(),
 		}
 
 	def add_store(self, store_name):
