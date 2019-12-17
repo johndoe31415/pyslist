@@ -23,6 +23,8 @@ import sqlite3
 import contextlib
 import datetime
 
+class OperationalException(Exception): pass
+
 class ShoppingListDB():
 	def __init__(self, sqlite_dbfile):
 		self._db = sqlite3.connect(sqlite_dbfile)
@@ -33,6 +35,15 @@ class ShoppingListDB():
 			CREATE TABLE items (
 				itemid integer PRIMARY KEY AUTOINCREMENT,
 				description varchar NOT NULL UNIQUE
+			);
+			""")
+
+		with contextlib.suppress(sqlite3.OperationalError):
+			self._cursor.execute("""
+			CREATE TABLE item_alias_names (
+				description varchar PRIMARY KEY,
+				itemid integer NOT NULL,
+				FOREIGN KEY(itemid) REFERENCES items(itemid)
 			);
 			""")
 
@@ -86,6 +97,9 @@ class ShoppingListDB():
 	def get_item_list(self):
 		return { itemid: description for (itemid, description) in self._cursor.execute("SELECT itemid, description FROM items;").fetchall() }
 
+	def get_item_aliases(self):
+		return { description: itemid for (description, itemid) in self._cursor.execute("SELECT description, itemid FROM item_alias_names;").fetchall() }
+
 	def _get_store_list(self):
 		return { storeid: storename for (storeid, storename) in self._cursor.execute("SELECT storeid, storename FROM stores;").fetchall() }
 
@@ -106,6 +120,7 @@ class ShoppingListDB():
 		return {
 			"shopping_list":	self.get_shopping_list(),
 			"items":			self.get_item_list(),
+			"item_aliases":		self.get_item_aliases(),
 			"stores":			self.get_stores(),
 		}
 
@@ -137,6 +152,14 @@ class ShoppingListDB():
 			item_ids[item_name] = self.add_item(item_name, commit = False)
 		self._db.commit()
 		return item_ids
+
+	def add_item_alias(self, itemid, alias_name):
+		(count, ) = self._cursor.execute("SELECT COUNT(*) FROM items WHERE description = ?;", (alias_name, )).fetchone()
+		if count == 0:
+			self._cursor.execute("INSERT INTO item_alias_names (itemid, description) VALUES (?, ?);", (itemid, alias_name))
+			self._db.commit()
+		else:
+			raise OperationalException("Item with name '%s' already exists as a main item, cannot add alias by that same name.")
 
 	def process_transaction(self, transactionid, itemid, delta, user):
 		if delta == 0:
@@ -171,5 +194,6 @@ if __name__ == "__main__":
 	import uuid
 	db = ShoppingListDB("pyslist.sqlite3")
 	foo_item = db.add_item("Foo Item")
+	db.add_item_alias(100, "Second name for 100")
 	db.process_transaction(str(uuid.uuid4()), itemid = foo_item, delta = 1, user = "joe")
 	print(db.get_all())
