@@ -170,13 +170,21 @@ export class ShoppingList {
 		this._async_fetch("/all");
 	}
 
+	_execute_transaction(transaction) {
+		/* TODO: Implement local storage and retry of transaction */
+		console.log("exec", transaction);
+		this._async_fetch("/transaction", transaction);
+	}
+
 	_add_item_with_id(itemid, delta) {
 		const transaction = {
 			"itemid":			itemid,
 			"delta":			delta,
 			"transactionid":	new_uuid4(),
 		};
-		console.log(transaction);
+		this._shopping_list[itemid] += delta;
+		this._display_shopping_list();
+		this._execute_transaction(transaction);
 	}
 
 	add_item(item_name, confirmation_callback) {
@@ -188,11 +196,13 @@ export class ShoppingList {
 
 			this._async_fetch("/item", { "name": item_name }, (msg) => {
 				/* Item was successfully created */
-				console.log("item created", msg);
-				this._add_item_with_id(0, 1);
+				const itemid = msg["itemid"];
+				this._items[itemid] = item_name;
+				this._id_by_item_name[item_name] = itemid;
+				this._add_item_with_id(itemid, 1);
 			});
 		} else {
-			this._add_item_with_id(this._id_by_item_name["item_name"], 1);
+			this._add_item_with_id(this._id_by_item_name[item_name], 1);
 		}
 	}
 }

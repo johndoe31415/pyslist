@@ -61,6 +61,14 @@ class APIServer():
 			},
 		}
 
+	def _execute_POST_item(self, post_data, auth_user):
+		itemid = self._database.add_item(post_data["name"])
+		return {
+			"success": True,
+			"msg": "add_item",
+			"itemid": itemid,
+		}
+
 	def _get_auth_user(self):
 		return os.getenv("REMOTE_USER")
 
@@ -95,6 +103,8 @@ class APIServer():
 			response = self._execute_POST_transaction(post_data = post_data, auth_user = auth_user)
 		elif (request_method == "GET") and (path_info == "/debug") and (self._config.debug):
 			response = self._execute_GET_debug(post_data = post_data, auth_user = auth_user)
+		elif (request_method == "POST") and (path_info == "/item"):
+			response = self._execute_POST_item(post_data = post_data, auth_user = auth_user)
 		else:
 			response = {
 				"success": False,
