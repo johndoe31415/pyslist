@@ -24,6 +24,7 @@ import os
 import sys
 import json
 import uuid
+import random
 from Configuration import Configuration
 from ShoppingListDB import ShoppingListDB
 
@@ -40,6 +41,10 @@ class APIServer():
 		}
 
 	def _execute_POST_transaction(self, post_data, auth_user):
+		# Introduce random error
+#		if random.randint(0, 3) != 0:
+#			raise Exception("CALL FAILED")
+
 		transactionid = str(uuid.UUID(post_data.get("transactionid")))
 		itemid = int(post_data.get("itemid"))
 		delta = int(post_data.get("delta"))
@@ -125,6 +130,8 @@ except Exception as e:
 if (not config.debug) and ("error_text" in response):
 	response["error_text"] = "Error details unavailable with disabled debugging."
 
+if not response["success"]:
+	print("Status: 400 Bad Request")
 print("Content-Type: application/json")
 print()
 print(json.dumps(response, separators = (",", ":")))

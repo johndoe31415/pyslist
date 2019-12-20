@@ -21,44 +21,7 @@
 	Johannes Bauer <JohannesBauer@gmx.de>
 */
 
-function hex(value, length) {
-	value = Number(value).toString(16);
-	while (value.length < length) {
-		value = "0" + value;
-	}
-	return value;
-}
-
-function new_uuid4() {
-	const bindata = [ ];
-	for (let i = 0; i < 16; i++) {
-		bindata[i] = (Math.random() * 256) | 0;
-	};
-	bindata[6] = (bindata[6] & 0x0f) | 0x40;
-	bindata[8] = (bindata[8] & 0x3f) | 0x80;
-
-	var string_uuid = "";
-	for (let i = 0; i < 4; i++) {
-		string_uuid += hex(bindata[i], 2);
-	}
-	string_uuid += "-";
-	for (let i = 4; i < 6; i++) {
-		string_uuid += hex(bindata[i], 2);
-	}
-	string_uuid += "-";
-	for (let i = 6; i < 8; i++) {
-		string_uuid += hex(bindata[i], 2);
-	}
-	string_uuid += "-";
-	for (let i = 8; i < 10; i++) {
-		string_uuid += hex(bindata[i], 2);
-	}
-	string_uuid += "-";
-	for (let i = 10; i < 16; i++) {
-		string_uuid += hex(bindata[i], 2);
-	}
-	return string_uuid;
-}
+import { new_uuid4 } from './uuid.js';
 
 export class ShoppingList {
 	constructor(options) {
@@ -84,8 +47,10 @@ export class ShoppingList {
 					item["name"] = "Unknown (ID " + item["itemid"] + ")";
 				}
 				item["orderid"] = item["itemid"];
-				sorted_shopping_list.push(item);
 
+				if (item.count > 0) {
+					sorted_shopping_list.push(item);
+				}
 			}
 		}
 
@@ -105,7 +70,22 @@ export class ShoppingList {
 
 		for (let item of this._get_sorted_shopping_list()) {
 			let li = document.createElement("li");
-			li.innerHTML = item.name;
+
+			{
+				const button = document.createElement("button");
+				button.innerHTML = "-";
+				button.addEventListener("click", (event) => {
+					this._add_item_with_id(item["itemid"], -1);
+				});
+				li.append(button);
+			}
+			{
+				const span = document.createElement("span");
+				const item_display = (item.count == 1) ? item.name : item.count + " x " + item.name;
+				span.innerHTML = item_display;
+				li.append(span);
+			}
+
 			ul.append(li);
 		}
 
@@ -114,11 +94,9 @@ export class ShoppingList {
 		div.innerHTML = "";
 		div.append(fragment);
 
-		console.log("show", this._options);
 	}
 
 	_store_data(data) {
-		console.log("rx", data);
 		if ("stores" in data) {
 			this._stores = data["stores"];
 		}
@@ -143,37 +121,53 @@ export class ShoppingList {
 			return;
 		}
 		if (msg["msg"] == "all") {
-			console.log(this, msg);
 			this._store_data(msg["data"]);
+		} else if (msg["msg"] == "transaction") {
+			/* Ignore */
 		} else {
 			console.log("Unhandled message type", msg);
 		}
 	}
 
-	_async_fetch(endpoint, post_data, dispatcher) {
+	_async_fetch(endpoint, post_data, dispatcher, retry_delay_secs) {
 		const options = {
 			"method":	post_data ? "post" : "get",
 		};
 		if (post_data) {
 			options["body"] = JSON.stringify(post_data);
 		}
-		fetch(this._base_api + endpoint, options).then(function(response) {
+		fetch(this._base_api + endpoint, options).then((response) => {
 			if (response.status == 200) {
 				return response.json();
 			} else {
-				console.log("Error fetching " + endpoint + " (HTTP " + response.status + ").");
+				console.log("Error fetching " + endpoint + " (HTTP " + response.status + "), retry " + retry_delay_secs + ".");
+				if (retry_delay_secs) {
+					setTimeout(() => this._async_fetch(endpoint, post_data, dispatcher, retry_delay_secs), 1000 * retry_delay_secs);
+				}
+				return null;
 			}
-		}).then((msg) => dispatcher ? dispatcher(msg) : this._dispatch(msg));
+		}).then((msg) => {
+			if (msg) {
+				if (dispatcher) {
+					dispatcher(msg);
+				} else {
+					this._dispatch(msg);
+				}
+			}
+		}).catch((exception) => {
+			console.log("Caught exception:", exception, "Retry:", retry_delay_secs);
+			if (retry_delay_secs) {
+				setTimeout(() => this._async_fetch(endpoint, post_data, dispatcher, retry_delay_secs), 1000 * retry_delay_secs);
+			}
+		});
 	}
 
 	retrieve_initially() {
-		this._async_fetch("/all");
+		this._async_fetch("/all", null, null, 2.0);
 	}
 
 	_execute_transaction(transaction) {
-		/* TODO: Implement local storage and retry of transaction */
-		console.log("exec", transaction);
-		this._async_fetch("/transaction", transaction);
+		this._async_fetch("/transaction", transaction, null, 2.0);
 	}
 
 	_add_item_with_id(itemid, delta) {
@@ -182,6 +176,9 @@ export class ShoppingList {
 			"delta":			delta,
 			"transactionid":	new_uuid4(),
 		};
+		if (!(itemid in this._shopping_list)) {
+			this._shopping_list[itemid] = 0;
+		}
 		this._shopping_list[itemid] += delta;
 		this._display_shopping_list();
 		this._execute_transaction(transaction);

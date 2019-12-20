@@ -47,9 +47,7 @@
 			const shopping_list = new ShoppingList(options);
 			shopping_list.retrieve_initially();
 
-			const add_item_name_textbox = document.getElementById("add_item_name_textbox");
-			document.getElementById("add_item_button").addEventListener("click", function(event) {
-				console.log("click", event);
+			function add_item() {
 				const item_name = add_item_name_textbox.value;
 
 				function confirmation_callback(item_name) {
@@ -59,7 +57,17 @@
 				if (item_name != "") {
 					shopping_list.add_item(item_name, confirmation_callback);
 				}
+			}
+
+			const add_item_name_textbox = document.getElementById("add_item_name_textbox");
+			document.getElementById("add_item_button").addEventListener("click", (event) => add_item());
+			add_item_name_textbox.addEventListener("keyup", (event) => {
+				if (event.key === "Enter") {
+					add_item();
+					event.preventDefault();
+				}
 			});
+
 		</script>
 	</body>
 </html>
