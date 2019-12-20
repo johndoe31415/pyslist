@@ -1,5 +1,4 @@
-<!doctype html>
-<!--
+/*
 	pyslist - Python-based shopping list
 	Copyright (C) 2019-2019 Johannes Bauer
 
@@ -20,15 +19,7 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 	Johannes Bauer <JohannesBauer@gmx.de>
--->
-<html>
-	<head>
-		<title>Python Shopping List</title>
-		<meta charset="utf-8" />
-		<link rel="stylesheet" href="default.css" />
-		<script language="JavaScript" type="module" src="pyslist.js"></script>
-	</head>
-	<body>
+*/
 
-	</body>
-</html>
+export class ShoppingList {
+}
