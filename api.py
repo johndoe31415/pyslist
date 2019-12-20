@@ -19,3 +19,13 @@
 #	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
+
+from Configuration import Configuration
+from ShoppingListDB import ShoppingListDB
+
+config = Configuration.default()
+database = ShoppingListDB(sqlite_dbfile = config.db_filename)
+
+print("Content-Type: application/json")
+print()
+print("null")
