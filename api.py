@@ -26,8 +26,8 @@ from Configuration import Configuration
 from ShoppingListDB import ShoppingListDB
 
 class APIServer():
-	def __init__(self):
-		self._config = Configuration.default()
+	def __init__(self, config):
+		self._config = config
 		self._database = ShoppingListDB(sqlite_dbfile = self._config.db_filename)
 
 	def _execute_get_all(self):
@@ -43,6 +43,15 @@ class APIServer():
 			"msg": "xaction",
 		}
 
+	def _execute_debug(self):
+		return {
+			"success": True,
+			"msg": "debug",
+			"data": {
+				"env": dict(os.environ),
+			},
+		}
+
 	def execute(self):
 		request_method = os.getenv("REQUEST_METHOD")
 		if request_method is not None:
@@ -53,24 +62,26 @@ class APIServer():
 			try:
 				post_data = json.load(sys.stdin)
 			except json.decoder.JSONDecodeError as e:
-				return {
+				response = {
 					"success": False,
 					"error_text": "JSON decoding error: %s" % (str(e)),
 				}
-
 		if (request_method == "GET") and (path_info == "/all"):
-			return self._execute_get_all()
+			response = self._execute_get_all()
 		elif (request_method == "POST") and (path_info == "/transaction"):
-			return self._execute_transaction(post_data)
+			response = self._execute_transaction(post_data)
+		elif (request_method == "GET") and (path_info == "/debug") and (self._config.debug):
+			response = self._execute_debug()
 		else:
-			return {
+			response = {
 				"success": False,
 				"error_text": "Unknown or unsupported REQUEST_METHOD %s / PATH_INFO %s" % (str(request_method), str(path_info)),
 			}
 		return response
 
+config = Configuration.default()
 try:
-	api_server = APIServer()
+	api_server = APIServer(config)
 	response = api_server.execute()
 except Exception as e:
 	response = {
@@ -78,6 +89,9 @@ except Exception as e:
 		"error_text": "Exception: %s" % (str(e)),
 	}
 
+if (not config.debug) and ("error_text" in response):
+	response["error_text"] = "Error details unavailable with disabled debugging."
+
 print("Content-Type: application/json")
 print()
-print(json.dumps(response))
+print(json.dumps(response, separators = (",", ":")))

@@ -44,6 +44,10 @@ class Configuration():
 	def db_filename(self):
 		return self._path_replace(self._config["database"])
 
+	@property
+	def debug(self):
+		return self._config.get("debug", False)
+
 if __name__ == "__main__":
 	config = Configuration.default()
 	print(config.db_filename)
