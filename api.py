@@ -30,15 +30,44 @@ class APIServer():
 		self._config = Configuration.default()
 		self._database = ShoppingListDB(sqlite_dbfile = self._config.db_filename)
 
-	def execute(self):
-		response = {
+	def _execute_get_all(self):
+		return {
 			"success": True,
-			"vars": dict(os.environ),
+			"msg": "all",
+			"data": self._database.get_all(),
 		}
-		return response
 
-print("Content-Type: application/json")
-print()
+	def _execute_transaction(self):
+		return {
+			"success": True,
+			"msg": "xaction",
+		}
+
+	def execute(self):
+		request_method = os.getenv("REQUEST_METHOD")
+		if request_method is not None:
+			request_method = request_method.upper()
+		path_info = os.getenv("PATH_INFO")
+		if request_method == "POST":
+			# Decode POST data as JSON
+			try:
+				post_data = json.load(sys.stdin)
+			except json.decoder.JSONDecodeError as e:
+				return {
+					"success": False,
+					"error_text": "JSON decoding error: %s" % (str(e)),
+				}
+
+		if (request_method == "GET") and (path_info == "/all"):
+			return self._execute_get_all()
+		elif (request_method == "POST") and (path_info == "/transaction"):
+			return self._execute_transaction(post_data)
+		else:
+			return {
+				"success": False,
+				"error_text": "Unknown or unsupported REQUEST_METHOD %s / PATH_INFO %s" % (str(request_method), str(path_info)),
+			}
+		return response
 
 try:
 	api_server = APIServer()
@@ -48,4 +77,7 @@ except Exception as e:
 		"success": False,
 		"error_text": "Exception: %s" % (str(e)),
 	}
+
+print("Content-Type: application/json")
+print()
 print(json.dumps(response))

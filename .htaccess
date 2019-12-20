@@ -1,5 +1,7 @@
-#AuthType Digest
-#Require valid-user
+AuthType Digest
+AuthName "Python Shopping List"
+AuthUserFile ".htpasswd"
+Require valid-user
 #DirectoryIndex index.py
 
 AddHandler cgi-script .py
