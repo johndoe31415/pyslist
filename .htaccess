@@ -1,0 +1,6 @@
+#AuthType Digest
+#Require valid-user
+#DirectoryIndex index.py
+
+AddHandler cgi-script .py
+Options +ExecCGI

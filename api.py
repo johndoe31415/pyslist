@@ -20,12 +20,31 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import os
 from Configuration import Configuration
 from ShoppingListDB import ShoppingListDB
 
-config = Configuration.default()
-database = ShoppingListDB(sqlite_dbfile = config.db_filename)
+class APIServer():
+	def __init__(self):
+		self._config = Configuration.default()
+		self._database = ShoppingListDB(sqlite_dbfile = config.db_filename)
+
+	def execute(self):
+		response = {
+			"success": True,
+			"vars": os.environ,
+		}
+		return response
 
 print("Content-Type: application/json")
 print()
-print("null")
+
+try:
+	api_server = APIServer()
+	response = api_server.execute()
+except Exception as e:
+	response = {
+		"success": False,
+		"error_text": "Exception: %s" % (str(e)),
+	}
+print(json.dumps(response))
