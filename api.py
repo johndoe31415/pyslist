@@ -21,18 +21,19 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import os
+import json
 from Configuration import Configuration
 from ShoppingListDB import ShoppingListDB
 
 class APIServer():
 	def __init__(self):
 		self._config = Configuration.default()
-		self._database = ShoppingListDB(sqlite_dbfile = config.db_filename)
+		self._database = ShoppingListDB(sqlite_dbfile = self._config.db_filename)
 
 	def execute(self):
 		response = {
 			"success": True,
-			"vars": os.environ,
+			"vars": dict(os.environ),
 		}
 		return response
 
