@@ -81,7 +81,7 @@ class APIServer():
 			try:
 				post_data = json.load(sys.stdin)
 			except json.decoder.JSONDecodeError as e:
-				response = {
+				return {
 					"success": False,
 					"error_text": "JSON decoding error: %s" % (str(e)),
 				}
