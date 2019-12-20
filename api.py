@@ -21,6 +21,7 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import os
+import sys
 import json
 from Configuration import Configuration
 from ShoppingListDB import ShoppingListDB

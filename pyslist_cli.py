@@ -23,6 +23,7 @@
 import sys
 import json
 import requests
+import uuid
 from MultiCommand import MultiCommand
 from ShoppingListDB import ShoppingListDB
 
@@ -60,13 +61,26 @@ def action_dump(cmd, args):
 
 def action_remote(cmd, args):
 	session = requests.Session()
+	post_data = None
 	if args.call == "debug":
+		method = session.get
 		uri = args.base_uri + "/debug"
 	elif args.call == "all":
+		method = session.get
 		uri = args.base_uri + "/all"
+	elif args.call == "transaction":
+		method = session.post
+		uri = args.base_uri + "/transaction"
+		post_data = {
+			"transactionid":	str(uuid.uuid4()),
+			"itemid":	10,
+			"delta":	1,
+		}
 	else:
 		raise NotImplementedError(args.call)
-	response = session.get(uri, auth = requests.auth.HTTPDigestAuth(args.username, args.password))
+
+
+	response = method(uri, auth = requests.auth.HTTPDigestAuth(args.username, args.password), data = post_data)
 	if response.status_code != 200:
 		print(response)
 		print("=" * 120)
@@ -86,7 +100,7 @@ def genparser(parser):
 mc.register("dump", "Dump the database structure", genparser, action = action_dump)
 
 def genparser(parser):
-	parser.add_argument("-c", "--call", choices = [ "debug", "all" ], default = "debug", help = "Call to execute on the remote side. Can be one of %(choices)s, defaults to %(default)s.")
+	parser.add_argument("-c", "--call", choices = [ "debug", "all", "transaction" ], default = "debug", help = "Call to execute on the remote side. Can be one of %(choices)s, defaults to %(default)s.")
 	parser.add_argument("-u", "--username", metavar = "username", default = "joe", help = "Username to authenticate against on the remote side. Defaults to %(default)s.")
 	parser.add_argument("-p", "--password", metavar = "password", default = "foobar", help = "Password to authenticate with on the remote side. Defaults to %(default)s.")
 	parser.add_argument("base_uri", metavar = "uri", type = str, help = "API endpoint URI on the remote side.")
