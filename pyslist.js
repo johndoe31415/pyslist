@@ -22,4 +22,18 @@
 */
 
 export class ShoppingList {
+	constructor() {
+		this._base_api = "api.py";
+	}
+
+	retrieve_initially() {
+		fetch(this._base_api + "/all").then(function(response) {
+			if (response.status == 200) {
+				console.log("JSON 200");
+				return response.text();
+			} else {
+				console.log("Error");
+			}
+		})
+	}
 }

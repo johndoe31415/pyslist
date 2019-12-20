@@ -29,6 +29,20 @@
 		<script language="JavaScript" type="module" src="pyslist.js"></script>
 	</head>
 	<body>
+		<div class="add_item_menu">
+			<input type="text" id="add_name" />
+			<button>+</button>
+		</div>
 
+		<div class="history">
+		</div>
+
+		<div class="shopping_list">
+		</div>
+
+		<script language="JavaScript">
+			const shopping_list = new ShoppingList();
+			shopping_list.retrieve_initially();
+		</script>
 	</body>
 </html>
