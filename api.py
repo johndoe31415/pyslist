@@ -23,6 +23,7 @@
 import os
 import sys
 import json
+import uuid
 from Configuration import Configuration
 from ShoppingListDB import ShoppingListDB
 

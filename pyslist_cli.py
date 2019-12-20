@@ -79,6 +79,8 @@ def action_remote(cmd, args):
 	else:
 		raise NotImplementedError(args.call)
 
+	if post_data is not None:
+		post_data = json.dumps(post_data).encode()
 
 	response = method(uri, auth = requests.auth.HTTPDigestAuth(args.username, args.password), data = post_data)
 	if response.status_code != 200:
