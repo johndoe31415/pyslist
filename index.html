@@ -26,6 +26,8 @@
 		<title>Python Shopping List</title>
 		<meta charset="utf-8" />
 		<link rel="stylesheet" href="default.css" />
+		<link rel="stylesheet" href="auto-complete.css" />
+		<script language="JavaScript" src="auto-complete.min.js"></script>
 	</head>
 	<body>
 		<div class="add_item_menu">
@@ -75,6 +77,13 @@
 			});
 
 			options["sort_order_combobox"].addEventListener("change", (event) => shopping_list.sort_order_changed());
+
+			const auto_completer = new autoComplete({
+				selector: add_item_name_textbox,
+				minChars: 1,
+				delay: 0,
+				source: (term, suggest) => shopping_list.attempt_autocomplete(term, suggest),
+			});
 		</script>
 	</body>
 </html>

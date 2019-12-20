@@ -41,6 +41,7 @@ export class ShoppingList {
 		this._items = null;
 		this._id_by_item_name = null;
 		this._shopping_list = null;
+		this._autocomplete = null;
 	}
 
 	_get_sorted_shopping_list() {
@@ -158,11 +159,14 @@ export class ShoppingList {
 		if ("items" in data) {
 			this._items = data["items"];
 			this._id_by_item_name = { };
+			this._autocomplete = [ ];
 			for (var itemid in this._items) {
 				itemid = itemid | 0;
 				const itemname = this._items[itemid];
 				this._id_by_item_name[itemname] = itemid;
+				this._autocomplete.push(itemname);
 			}
+			this._autocomplete.sort();
 		}
 		if ("shopping_list" in data) {
 			this._shopping_list = data["shopping_list"];
@@ -260,5 +264,21 @@ export class ShoppingList {
 
 	sort_order_changed() {
 		this._display_shopping_list();
+	}
+
+	attempt_autocomplete(term, suggest) {
+		if (this._autocomplete == null) {
+			return;
+		}
+
+		term = term.toLowerCase();
+		var matches = [ ];
+		for (let i = 0; i < this._autocomplete.length; i++) {
+			if (this._autocomplete[i].toLowerCase().indexOf(term) == 0) {
+				matches.push(this._autocomplete[i]);
+			}
+		}
+		matches.sort();
+		suggest(matches);
 	}
 }
