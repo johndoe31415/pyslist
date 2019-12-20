@@ -104,7 +104,7 @@ class ShoppingListDB():
 		return { storeid: storename for (storeid, storename) in self._cursor.execute("SELECT storeid, storename FROM stores;").fetchall() }
 
 	def _get_store_order(self, storeid):
-		return { itemid: orderno for (itemid, orderno) in self._cursor.execute("SELECT storeid, itemid FROM storeitemorder WHERE storeid = ?;", (storeid, )).fetchall() }
+		return { itemid: orderno for (itemid, orderno) in self._cursor.execute("SELECT itemid, orderno FROM storeitemorder WHERE storeid = ?;", (storeid, )).fetchall() }
 
 	def get_stores(self):
 		stores = { }

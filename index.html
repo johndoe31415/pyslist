@@ -32,6 +32,11 @@
 			<input type="text" id="add_item_name_textbox" />
 			<button id="add_item_button">+</button>
 		</div>
+		<div class="sort_order">
+			<select id="sort_order_combobox">
+				<option value="">Alphabetical</option>
+			</select>
+		</div>
 
 		<div class="history">
 		</div>
@@ -43,6 +48,7 @@
 			import { ShoppingList } from './pyslist.js';
 			const options = {
 				"shopping_list_div":	document.getElementById("shopping_list_div"),
+				"sort_order_combobox":	document.getElementById("sort_order_combobox"),
 			};
 			const shopping_list = new ShoppingList(options);
 			shopping_list.retrieve_initially();
@@ -68,6 +74,7 @@
 				}
 			});
 
+			options["sort_order_combobox"].addEventListener("change", (event) => shopping_list.sort_order_changed());
 		</script>
 	</body>
 </html>
