@@ -26,23 +26,40 @@
 		<title>Python Shopping List</title>
 		<meta charset="utf-8" />
 		<link rel="stylesheet" href="default.css" />
-		<script language="JavaScript" type="module" src="pyslist.js"></script>
 	</head>
 	<body>
 		<div class="add_item_menu">
-			<input type="text" id="add_name" />
-			<button>+</button>
+			<input type="text" id="add_item_name_textbox" />
+			<button id="add_item_button">+</button>
 		</div>
 
 		<div class="history">
 		</div>
 
-		<div class="shopping_list">
+		<div class="shopping_list" id="shopping_list_div">
 		</div>
 
-		<script language="JavaScript">
-			const shopping_list = new ShoppingList();
+		<script language="JavaScript" type="module">
+			import { ShoppingList } from './pyslist.js';
+			const options = {
+				"shopping_list_div":	document.getElementById("shopping_list_div"),
+			};
+			const shopping_list = new ShoppingList(options);
 			shopping_list.retrieve_initially();
+
+			const add_item_name_textbox = document.getElementById("add_item_name_textbox");
+			document.getElementById("add_item_button").addEventListener("click", function(event) {
+				console.log("click", event);
+				const item_name = add_item_name_textbox.value;
+
+				function confirmation_callback(item_name) {
+					return confirm("Item \"" + item_name + "\" does not exist yet. Create it?");
+				}
+
+				if (item_name != "") {
+					shopping_list.add_item(item_name, confirmation_callback);
+				}
+			});
 		</script>
 	</body>
 </html>
